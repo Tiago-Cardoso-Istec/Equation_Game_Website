@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Welcome to the Equation Game</h1>
+    </header>
+
+    <main>
+        <div id="menu">
+
+            <button class="button" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div class="game-rules">
+            <h2>Game Rules</h2>
+            <ol>
+                <li>The game presents you with a series of simple equations to solve.</li>
+                <li>Each equation consists of two operands and an operator (+, -, *, or /).</li>
+                <li>Your task is to give the correct answer for each equation.</li>
+                <li>Enter your answer in the answer input field and click the Submit button (or press Enter).</li>
+                <li>If your answer is correct, you will earn a point and proceed to the next equation.</li>
+                <li>If your answer is incorrect, no points will be awarded, but you can try again with a new equation.</li>
+                <li>The game has a time limit of 2 minutes.</li>
+                <li>Your goal is to solve as many equations as possible within the given time.</li>
+                <li>At the end of the game, your score will be displayed, indicating the number of correct answers.</li>
+            </ol>
+        </div>
+
+        <div id="game" style="display: none;">
+            <div class="game-container">
+                <h2>Equation Game</h2>
+                <p class="equation" id="equation"></p>
+                <input type="text" class="answer-input" id="answer" placeholder="Enter your answer">
+                <button class="button submit-button" onclick="checkAnswer()">Submit</button>
+                <p class="score" id="score"></p>
+            </div>
+        </div>
+
+        <div id="end" style="display: none;">
+            <h2>Game Over</h2>
+            <p>Final Score: <span id="final-score"></span></p>
+            <button class="button play-again" id="play-again">Play Again</button>
+            <button class="button go-to-index" id="go-to-index">Go to Main Page</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2023 My Web Page. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // JavaScript code goes here
+        var score = 0;
+        var timer;
+        var seconds = 120; // 2 minutes
+        var minutes = Math.floor(seconds / 60);
+        var remainingSeconds = seconds % 60;
+
+        function startGame() {
+            document.getElementById("menu").style.display = "none";
+            document.getElementById("game").style.display = "block";
+            startTimer();
+            generateEquation();
+        }
+
+        function startTimer() {
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            seconds--;
+            if (seconds < 0) {
+                clearInterval(timer);
+                endGame();
+            }
+            minutes = Math.floor(seconds / 60);
+            remainingSeconds = seconds % 60;
+            document.getElementById("score").textContent = 'Time Remaining: ' + minutes + ':' + remainingSeconds + ' | Score: ' + score;
+        }
+
+        function generateEquation() {
+            var operand1 = Math.floor(Math.random() * 10) + 1;
+            var operand2 = Math.floor(Math.random() * 10) + 1;
+            var operators = ['+', '-', '*', '/'];
+            var operator = operators[Math.floor(Math.random() * operators.length)];
+            var equation = operand1 + ' ' + operator + ' ' + operand2;
+            document.getElementById("equation").textContent = equation;
+            document.getElementById("equation").classList.remove("correct", "incorrect");
+            document.getElementById("answer").value = '';
+            document.getElementById("answer").focus();
+        }
+
+        function checkAnswer() {
+            var userAnswer = parseInt(document.getElementById("answer").value);
+            var equationParts = document.getElementById("equation").textContent.split(' ');
+            var operand1 = parseInt(equationParts[0]);
+            var operator = equationParts[1];
+            var operand2 = parseInt(equationParts[2]);
+            var correctAnswer;
+
+            switch (operator) {
+                case '+':
+                    correctAnswer = operand1 + operand2;
+                    break;
+                case '-':
+                    correctAnswer = (operand1 - operand2);
+                    break;
+                case '*':
+                    correctAnswer = operand1 * operand2;
+                    break;
+                case '/':
+                    correctAnswer = Math.floor(operand1 / operand2);
+                    break;
+            }
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                document.getElementById("score").textContent = 'Time Remaining: ' + minutes + ':' + remainingSeconds + ' | Score: ' + score;
+                document.body.classList.add("correct");
+            } else {
+                document.getElementById("score").textContent = 'Time Remaining: ' + minutes + ':' + remainingSeconds + ' | Incorrect! Score: ' + score;
+                document.body.classList.add("incorrect");
+            }
+
+            setTimeout(function () {
+                document.body.classList.remove("correct", "incorrect");
+                generateEquation();
+            }, 1000);
+
+        }
+
+        // Add event listener for Enter key press on the input field
+        document.getElementById("answer").addEventListener("keydown", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+
+        function endGame() {
+            document.getElementById("game").style.display = "none";
+            document.getElementById("end").style.display = "block";
+            document.getElementById("final-score").textContent = score;
+            score = 0;
+            seconds = 120; // Reset the timer
+        }
+
+        document.getElementById("play-again").addEventListener("click", function () {
+            document.getElementById("end").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+        });
+
+        document.getElementById("go-to-index").addEventListener("click", function () {
+            window.location.href = "index.html"; // Replace "index.html" with your index page URL
+        });
+    </script>
+</body>
+</html>
